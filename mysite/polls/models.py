@@ -1,6 +1,7 @@
 from django.db import models
 import datetime
 from django.utils import timezone
+from django.contrib import admin
 
 #modelo de base de datos de preguntas
 class Question(models.Model):
@@ -9,11 +10,17 @@ class Question(models.Model):
     
     def __str__(self):
         return self.question_text
+    
+    @admin.display(
+        boolean=True,
+        ordering="pub_date",
+        description="Published recently",
+    )
 
     def was_published_recently(self):
         now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <= now
-        
+        return self.pub_date >= now.date() - datetime.timedelta(days=1)
+    
 #modelo de base de datos de elecciones
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
